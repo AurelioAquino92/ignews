@@ -5,6 +5,10 @@ const routes = [
       type: 'publication',
       path: '/posts',
     },
+    {
+      type: 'publication',
+      path: '/posts/[slug]',
+    },
   ]
 
 const repoName = 'ignews-aurelio'
