@@ -2,19 +2,20 @@ import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import styles from './styles.module.scss'
 import { prismicClient } from '../../services/prismic';
+import { RichText } from 'prismic-dom'
 
-interface PostProps {
-    publications: {
-        id: string,
-        uid: string,
-        href: string,
-        first_publication_date: Date,
-        title: string,
-        text: string
-    }[]
+type Post = {
+    slug: string,
+    title: string,
+    summary: string,
+    updatedAt: string
 }
 
-export default function Posts({publications}: PostProps) {
+interface PostProps {
+    posts: Post[]
+}
+
+export default function Posts({posts}: PostProps) {
     
     return (
         <>
@@ -24,11 +25,11 @@ export default function Posts({publications}: PostProps) {
 
             <main className={styles.container}>
                 <div className={styles.posts}>
-                    {publications.map((publication) => (
-                        <a href={publication.href}>
-                            <time>12 de março de 2022</time>
-                            <strong>{publication.uid}</strong>
-                            <p>informações do post para leitura</p>
+                    {posts.map(post => (
+                        <a key={post.slug} href="">
+                            <time>{post.updatedAt}</time>
+                            <strong>{post.title}</strong>
+                            <p>{post.summary}</p>
                         </a>
                     ))}
                 </div>
@@ -42,9 +43,23 @@ export const getStaticProps: GetStaticProps = async () => {
         fetch: ['title', 'content'],
         pageSize: 100
     })
+
+    const posts = publications.map(publication => {
+        return {
+            slug: publication.uid,
+            title: RichText.asText(publication.data.title),
+            summary: publication.data.content.find(content => content.type === 'paragraph')?.text ?? '',
+            updatedAt: new Date(publication.last_publication_date).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            })
+        }
+    })
+
     return {
         props: {
-            publications
+            posts
         },
         revalidate: 60 * 60 * 24
     }
