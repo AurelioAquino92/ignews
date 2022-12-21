@@ -27,12 +27,10 @@ export default function Posts({posts}: PostProps) {
             <main className={styles.container}>
                 <div className={styles.posts}>
                     {posts.map(post => (
-                        <Link href={`/posts/${post.slug}`} legacyBehavior>
-                            <a key={post.slug}>
+                        <Link key={post.slug} href={`/posts/${post.slug}`}>
                                 <time>{post.updatedAt}</time>
                                 <strong>{post.title}</strong>
                                 <p>{post.summary}</p>
-                            </a>
                         </Link>
                     ))}
                 </div>
